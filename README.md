@@ -14,21 +14,21 @@
 </div>
 
 ## Data folders
-Our data files are located in `SPTS/Data_Analysis`. Each data folder is explained below.
+Our data files are located in `SPTS/Data_Analysis`. The data contained in each folder is explained below.
 * `/Measurements_Collected` contains both raster and compressive scans for 17 daily objects;
 * `/Application_Data` contains both compressive scans we collected for Rapid Contact Localization `/ball_bouncing` and the demo video with the robot arm `/robort_arm`.
   
 ## Usage
-The codes for using our methods for tactile image data and realizing our results are explained below. The folder `ksvdbox13` for training ksvd dictionary was downloaded from [here](https://csaws.cs.technion.ac.il/~ronrubin/software.html). This folder is included in the repository at `SPTS/Data_Analysis/Dictionary_Learning`.
+The codes that applied our methods for tactile image data and realizing our results are explained below. The folder `ksvdbox13` for training ksvd dictionary was downloaded from [here](https://csaws.cs.technion.ac.il/~ronrubin/software.html). This folder is included in the repository at `SPTS/Data_Analysis/Dictionary_Learning`.
   
 ### Compressed and Raster Data Acquisition
-All files associated with data collection is in `/Data_Collection`. To collect data, please first upload the code in`Microcontroller_Code/Receiver_Code/Receiver_Code.ino` onto each Attiny412 on the tactile sensor hardware using a USB UPDI uploader. Make sure that each Attiny412 has a different address by changing the "adrs" variable before you upload to the microcontroller. Once all Attiny412s are programmed, connect the Teensy4.1 to your computer and upload the code in `/Microcontroller_Code/Transmitter_Code/Transmitter_Code.ino`. Depending on whether you would like to collect raster scans or compressive scans, follow instuctions in the comments at the Loop function. Once the transmitter code is uploaded, immediately run the matlab script in `/Matlab_Code/DataCollection.m`, and data collections should start. You can end data collection by simply using the stop button in matlab.
+All files associated with data collection is in `/Data_Collection`. To collect data, please first upload the code in`Microcontroller_Code/Receiver_Code/Receiver_Code.ino` onto each Attiny412 on the tactile sensor hardware using a USB UPDI uploader. Make sure that each Attiny412 has a different address by changing the "adrs" variable before you upload to the microcontroller. Certain addresses are reserved. Here we used 8-107 for our 100 sensors. Once all Attiny412s are programmed, connect the Teensy4.1 to your computer and upload the code in `/Microcontroller_Code/Transmitter_Code/Transmitter_Code.ino`. Depending on whether you would like to collect raster scans or compressive scans, follow instuctions in the comments at the Loop function. Once the transmitter code is uploaded, run the matlab script in `/Matlab_Code/DataCollection.m`, and data collections should start. You can end data collection by simply using the stop button in matlab.
 
 ### Tactile Dictionary Learning
 The folder `Data_Analysis/Dictionary_Learning` is for creating the dictionary used during OMP reconstruction. For our usage, we opened ran `visualize_learnD.m`, which loads raster scan entries inside `Raster_Entries.mat` to generate the dictionary, which saves it as `dictionary.mat`. For the applications section, since objects are dropped to different locations of the sensor, we have to permute each entry in the dictionary to every possible location on the sensor. To achieve this, we ran `permutation.m` on `dictionary.mat`, and its output is saved as `permuted_dictionary.mat` in the same directory. 
 
 ### SRC Library for SRC Accuracy Measurement
-Raster scans used as examples for the SRC library are located in `Data_Analysis/SRC_Library/Library_Entries`, separate for each object. There are 10 scans for each object. Library is created by appending scans for all object together, back to back, in addition to adding 10 blank frames (100*1 vector) at front as the "empty" object. The finalized library is in `Data_Analysis/SRC_Library/SRC_lib.mat`.
+Raster scans used as examples to formulate the SRC library are located in `Data_Analysis/SRC_Library/Library_Entries`, separate for each object. There are 10 scans for each object. Library is created by appending scans for all object together, back to back, in addition to adding 10 blank frames (100*1 vector) at front as the "empty" object. The finalized library is in `Data_Analysis/SRC_Library/SRC_lib.mat`.
 
 ### Random Weights Generation
 Files responsible for generating random binary weights that all Attiny412s are programmed to generate are in `Data_Analysis/Random_Weights_Generation`. The same LCG function used by every Attiny412 is defined in `lcgRandom.m`, which is called by `amatrix.m` to generate random weight sequences based on the seed and the length of the sequence wanted. For our application, to save time later on, we generated all random weights before data processing: for seeds 8-107 and for a length of 100000, so that no matter how long we collect data, we always have corresponding weights. This is automated in `generate_weights.m`, please run it before any data processing steps. 
@@ -42,7 +42,7 @@ For compressive sensing scans, the experiment method, run `SPTS_ClassificationAc
 If you would like to generate Figure 3E, run `SPTS_ClassificationTime.m`. This file runs all objects at once, and would not need modifications on the user's end.
 
 ### High-Speed Projectile Tracking and Rapid Contact Localization
-Both are contained in `Data_Analysis/Applications.m`. Code lines exclusively necessary for Location Accuracy (Fig 6) and max pressure v. time (Fig 5) are commented accordingly. Please add or remove comments accordingly.
+To illustrate the high-speed performance of our sensor design, we bounced a tennis ball on the sensor matrix. We then analyze the data for High-Speed Projectile Tracking and Rapid Contact Localization. Both codes are contained in `Data_Analysis/Applications.m`. Code lines exclusively necessary for Location Accuracy (Fig 6) and max pressure v. time (Fig 5) are commented accordingly. Please add or remove commented codes accordingly.
 
 ### Robot Arm Demonstration
 To graph the continuous raster scans and reconstructed frames collected for the Robot Arm demo, run `Data_Analysis/robot_arm.m`. It will generate two graphs, for raster and recosntruction separately. Note that for our video we reconstruct every 25 measurements, and raster frames use 100 measurements. Thus reconstructed frames are 4 times the number of raster frames.  
